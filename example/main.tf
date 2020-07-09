@@ -1,5 +1,5 @@
 module "kms_key" {
-  source    = "git::https://github.com/cloudposse/terraform-aws-kms-key.git?ref=0.11/master"
+  source    = "git::https://github.com/cloudposse/terraform-aws-kms-key.git?ref=0.4.0"
   namespace = "cp"
   stage     = "prod"
   name      = "app"
@@ -15,7 +15,7 @@ module "kms_key" {
 }
 
 module "bucket" {
-  source  = "git::https://github.com/cloudposse/terraform-aws-s3-bucket.git?ref=0.11/master"
+  source  = "git::https://github.com/cloudposse/terraform-aws-s3-bucket.git?ref=0.14.0"
   enabled = "true"
 
   namespace = "cp"
@@ -30,7 +30,7 @@ module "bucket" {
   user_enabled       = "false"
 
   sse_algorithm      = "aws:kms"
-  kms_master_key_arn = "${module.kms_key.key_arn}"
+  kms_master_key_arn = module.kms_key.key_arn
 }
 
 data "aws_iam_policy_document" "resource_full_access" {
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "base" {
       "s3:ListBucketVersions",
     ]
 
-    resources = ["${module.bucket.bucket_arn}"]
+    resources = [module.bucket.bucket_arn]
     effect    = "Allow"
   }
 }
@@ -76,8 +76,11 @@ module "role" {
 
   principals = {}
 
+  role_description = "test"
+  policy_description = "test"
+
   policy_documents = [
-    "${data.aws_iam_policy_document.resource_full_access.json}",
-    "${data.aws_iam_policy_document.base.json}",
+    data.aws_iam_policy_document.resource_full_access.json,
+    data.aws_iam_policy_document.base.json,
   ]
 }
