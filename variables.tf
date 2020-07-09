@@ -26,25 +26,25 @@ variable "delimiter" {
 }
 
 variable "attributes" {
-  type        = list
+  type        = list(string)
   default     = []
   description = "Additional attributes (e.g. `1`)"
 }
 
 variable "tags" {
-  type        = map
+  type        = map(string)
   default     = {}
   description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)"
 }
 
 variable "principals" {
-  type        = map
+  type        = map(string)
   description = "Map of service name as key and a list of ARNs to allow assuming the role as value. (e.g. map(`AWS`, list(`arn:aws:iam:::role/admin`)))"
   default     = {}
 }
 
 variable "policy_documents" {
-  type        = list
+  type        = list(string)
   description = "List of JSON IAM policy documents"
   default     = []
 }

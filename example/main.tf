@@ -74,7 +74,9 @@ module "role" {
   stage     = "prod"
   name      = "app"
 
-  principals = {}
+  principals = {
+    AWS = "arn:aws:iam::123456789:root"
+  }
 
   role_description = "test"
   policy_description = "test"
