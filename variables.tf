@@ -74,3 +74,15 @@ variable "policy_description" {
   type        = string
   description = "The description of the IAM policy that is visible in the IAM policy manager"
 }
+
+variable "enable_mfa" {
+  description = "Whether role requires MFA"
+  type        = bool
+  default     = false
+}
+
+variable "mfa_age" {
+  description = "Max age of valid MFA (in seconds) for roles which require MFA"
+  type        = number
+  default     = 86400
+}

@@ -23,9 +23,35 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "assume_role_mfa" {
+  count = length(keys(var.principals))
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = element(keys(var.principals), count.index)
+      identifiers = [
+        var.principals[element(keys(var.principals), count.index)]]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:MultiFactorAuthPresent"
+      values   = ["true"]
+    }
+
+//    condition {
+//      test     = "NumericLessThan"
+//      variable = "aws:MultiFactorAuthAge"
+//      values   = [var.mfa_age]
+//    }
+  }
+}
 module "aggregated_assume_policy" {
   source           = "git::https://github.com/cloudposse/terraform-aws-iam-policy-document-aggregator.git?ref=tags/0.2.0"
-  source_documents = data.aws_iam_policy_document.assume_role.*.json
+  source_documents = var.enable_mfa ? data.aws_iam_policy_document.assume_role_mfa.*.json : data.aws_iam_policy_document.assume_role.*.json
 }
 
 resource "aws_iam_role" "default" {
