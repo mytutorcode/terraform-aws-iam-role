@@ -10,7 +10,7 @@ module "label" {
 }
 
 data "aws_iam_policy_document" "assume_role" {
-  count = length(keys(var.principals))
+  count = !var.enable_mfa ? length(keys(var.principals)) : 0
 
   statement {
     effect  = "Allow"
@@ -18,13 +18,13 @@ data "aws_iam_policy_document" "assume_role" {
 
     principals {
       type        = element(keys(var.principals), count.index)
-      identifiers = [var.principals[element(keys(var.principals), count.index)]]
+      identifiers = var.principals[element(keys(var.principals), count.index)]
     }
   }
 }
 
 data "aws_iam_policy_document" "assume_role_mfa" {
-  count = length(keys(var.principals))
+  count = var.enable_mfa ? length(keys(var.principals)) : 0
 
   statement {
     effect  = "Allow"
@@ -32,8 +32,7 @@ data "aws_iam_policy_document" "assume_role_mfa" {
 
     principals {
       type        = element(keys(var.principals), count.index)
-      identifiers = [
-        var.principals[element(keys(var.principals), count.index)]]
+      identifiers = var.principals[element(keys(var.principals), count.index)]
     }
 
     condition {
